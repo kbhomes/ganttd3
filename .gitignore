@@ -1,5 +1,7 @@
-### RequireJS build output.
+### Build output.
 build/ganttd3.js
+build/ganttd3.min.js
+build/ganttd3.css
 
 ### WebStorm ###
 .idea/
@@ -22,5 +24,5 @@ npm-debug.log
 node_modules
 
 ### SASS ###
-*.sass-cache
+.sass-cache/
 *.css
