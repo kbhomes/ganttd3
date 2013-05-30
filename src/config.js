@@ -4,13 +4,13 @@ require.config({
     urlArgs: "bust=" + (new Date()).getTime(),
 
     paths: {
-        underscore: '../vendor/underscore',
-        backbone: '../vendor/backbone',
-        d3: '../vendor/d3.v3',
+        underscore: '../lib/underscore',
+        backbone: '../lib/backbone',
+        d3: '../lib/d3.v3',
 
         // IE8 attempted fix.
-        'aight': '../vendor/aight',
-        'aight.d3': '../vendor/aight.d3'
+        'aight': '../lib/aight',
+        'aight.d3': '../lib/aight.d3'
     },
 
     shim: {
