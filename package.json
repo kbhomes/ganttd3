@@ -1,0 +1,17 @@
+{
+  "name": "GanttD3",
+  "version": "0.0.0",
+  "description": "A JavaScript Gantt chart, primarily using D3.js.",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-sass": "~0.3.0",
+    "grunt-contrib-requirejs": "~0.4.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "Sajid Anwar",
+  "license": "BSD"
+}
