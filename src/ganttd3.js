@@ -1,7 +1,4 @@
 define(function(require) {
-    if (document.querySelectorAll('body.ie').length)
-        require('aight');
-
     var Backbone = require('backbone'),
         Base = require('util/base'),
 
@@ -18,9 +15,6 @@ define(function(require) {
 
         d3 = require('d3'),
         _ = require('underscore');
-
-    if (document.querySelectorAll('body.ie').length)
-        require('aight.d3');
 
     return Base.extend({
         constructor: function(selector, customSettings) {
