@@ -1,6 +1,4 @@
 require.config({
-    deps: ['ganttd3'],
-
     urlArgs: "bust=" + (new Date()).getTime(),
 
     paths: {
