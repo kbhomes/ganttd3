@@ -45,7 +45,9 @@ module.exports = function(grunt) {
                     'build/ganttd3.css': 'src/ganttd3.scss'
                 }
             }
-        }
+        },
+
+        clean: ['build/ganttd3.js', 'build/ganttd3.min.js', 'build/ganttd3.css']
     });
 
     // Load the plugin that provides the "requirejs" task.
@@ -54,6 +56,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
+
+    // Load the plugin that provides the "clean" task.
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task(s).
     grunt.registerTask('default', ['requirejs', 'uglify', 'sass']);
