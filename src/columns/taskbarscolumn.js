@@ -134,7 +134,7 @@ define(function(require) {
                 var table = popup.select('table.taskdata');
 
                 // IE doesn't allow you to set innerHTML of table elements.
-                if (aight) {
+                if (typeof 'aight' !== 'undefined') {
                     var node = table.node();
 
                     while (node.hasChildNodes()) {
