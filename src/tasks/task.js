@@ -1,6 +1,6 @@
 define(function(require) {
-    var Base = require('base'),
-        Util = require('util'),
+    var Base = require('util/base'),
+        Util = require('util/util'),
         d3 = require('d3'),
         _ = require('underscore');
 

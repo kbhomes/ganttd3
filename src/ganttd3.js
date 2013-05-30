@@ -3,7 +3,7 @@ define(function(require) {
         require('aight');
 
     var Backbone = require('backbone'),
-        Base = require('base'),
+        Base = require('util/base'),
 
         Task = require('tasks/task'),
         TaskCollection = require('tasks/taskcollection'),

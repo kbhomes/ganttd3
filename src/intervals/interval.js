@@ -1,5 +1,5 @@
 define(function(require) {
-    var Base = require('base'),
+    var Base = require('util/base'),
         d3 = require('d3'),
         _ = require('underscore');
 

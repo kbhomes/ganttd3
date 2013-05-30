@@ -1,5 +1,5 @@
 define(function(require) {
-    var Base = require('base'),
+    var Base = require('util/base'),
         Task = require('tasks/task');
 
     // Column

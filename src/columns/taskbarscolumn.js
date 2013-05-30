@@ -1,7 +1,7 @@
 define(function(require) {
     var Column = require('columns/column'),
         Task = require('tasks/task'),
-        Util = require('util'),
+        Util = require('util/util'),
         d3 = require('d3'),
         _ = require('underscore');
 

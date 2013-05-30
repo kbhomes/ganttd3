@@ -1,7 +1,7 @@
 define(function(require) {
     var Interval = require('intervals/interval'),
-        Base = require('base'),
-        Util = require('util'),
+        Base = require('util/base'),
+        Util = require('util/util'),
         d3 = require('d3');
 
     // WeekInterval
