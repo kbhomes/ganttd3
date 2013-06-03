@@ -2,37 +2,74 @@ define(function(require) {
     var Base = require('util/base'),
         Util = require('util/util'),
         d3 = require('d3'),
-        _ = require('underscore');
+        _ = require('underscore'),
+        Backbone = require('backbone');
 
     // Task
     return Base.extend({
         defaults: {
             id: '',
+            name: '',
+            path: [],
             number: '',
             estStartDate: new Date(),
             estEndDate: new Date(),
             actStartDate: new Date(),
             actEndDate: new Date(),
             color: '',
-            link: '',
-            milestone: false,
-            resource: '',
             completed: 0.00,
-            group: true,
-            parent: '',
-            open: true,
-            dependencies: '',
+            collapsed: false,
+            visible: true,
             caption: ''
         },
 
-        initialize: function() {
-            if (!this.has('collapsed')) {
-                this.set('collapsed', false);
-            }
+        get: function(attr) {
+            var value = Backbone.Model.prototype.get.call(this, attr);
 
-            if (!this.has('visible')) {
-                this.set('visible', true)
+            if (typeof value == 'function' && (attr == 'group' || attr == 'actStartDate' || attr == 'actEndDate')) {
+                return value.call(this);
             }
+            else {
+                return value;
+            }
+        },
+
+        initialize: function() {
+            this.set('tasks', []);
+
+            // Parse an ID path into its components.
+            var path = this.get('id').split('/');
+            var name = path.pop();
+
+            this.set('path', path)
+            this.set('name', name);
+
+            this.set('group', function() {
+                return this.get('forceGroup') || this.get('tasks').length > 0;
+            });
+
+            this.set('_actStartDate', this.get('actStartDate'));
+            this.set('actStartDate', function() {
+                return this.get('forceActStartDate') ||
+                    this.get('group') ?
+                        d3.min(this.get('tasks'), function(t) { return t.get('actStartDate'); }) :
+                        this.get('_actStartDate');
+            });
+
+            this.set('_actEndDate', this.get('actEndDate'));
+            this.set('actEndDate', function() {
+                if (this.get('forceActEndDate'))
+                    return this.get('forceActEndDate');
+
+                if (this.get('group')) {
+                    if (_.every(this.get('tasks'), function(t) { return t.get('actEndDate'); }))
+                        return d3.max(this.get('tasks'), function(t) { return t.get('actEndDate'); });
+                    else
+                        return undefined;
+                }
+                else
+                    return this.get('_actEndDate');
+            });
         },
 
         getEstDuration: function() {
@@ -41,22 +78,14 @@ define(function(require) {
         },
 
         getComputedCompletion: function() {
-            if (!this.has('computedCompletion')) {
-                if (this.get('group') && this.has('gantt')) {
-                    var id = this.get('id');
-                    var data = this.get('gantt').get('data');
-                    var comp = Math.ceil(d3.mean(data.filter(function(d) { return d.get('parent') == id; }).map(function(d) { return d.getComputedCompletion(); })));
-                    this.set('computedCompletion', comp);
-                    return comp;
-                }
-                else {
-                    var comp = this.get('completed');
-                    this.set('computedCompletion', comp);
-                    return comp;
-                }
+            if (this.get('group')) {
+                var children = this.get('tasks');
+                var comp = Math.ceil(d3.mean(_.map(children, function(d) { return d.getComputedCompletion(); })));
+
+                return comp;
             }
             else {
-                return this.get('computedCompletion');
+                return this.get('completed');
             }
         },
 
@@ -137,18 +166,7 @@ define(function(require) {
         },
 
         getIndentClass: function() {
-            var gantt = this.get('gantt');
-            var data = gantt.get('data');
-
-            var indent = 0;
-            var ancestor, ancestorId = this.get('parent');
-
-            while (ancestorId && (ancestor = data.get(ancestorId))) {
-                ancestorId = ancestor.get('parent');
-                indent++;
-            }
-
-            return 'indent' + indent;
+            return 'indent' + this.get('path').length;
         },
 
         getRowFontWeight: function() {
@@ -156,20 +174,11 @@ define(function(require) {
         },
 
         getChildren: function(directOnly) {
-            if (!this.get('group'))
-                return;
-
-            var gantt = this.get('gantt');
-            var data = gantt.get('data');
-            var id = this.get('id');
-
             var ret = {};
-            ret.children = data.filter(function(d,i) {
-                return d.get('parent') == id;
-            });
+            ret.children = this.get('tasks');
 
             if (!directOnly) {
-                ret.descendants = ret.children.map(function(cd, ci) {
+                ret.descendants = ret.children.map(function(cd) {
                    return cd.getChildren();
                 });
             }
@@ -182,7 +191,6 @@ define(function(require) {
                 return;
 
             var gantt = this.get('gantt');
-            var data = gantt.get('data');
 
             var collapsed = this.get('collapsed');
             var target = collapsed;
@@ -217,5 +225,9 @@ define(function(require) {
             if (first == true)
                 gantt.redraw();
         },
+
+        toString: function() {
+            return 'Task ' + this.get('id');
+        }
     });
 });

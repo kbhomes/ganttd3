@@ -30,6 +30,8 @@ define(function(require) {
                 barCompletionHeight: 5,
                 groupCompletionHeight: 3,
 
+                pathSeparator: '/',
+
                 interval: new WeekInterval(),
 
                 useDayInterval: function() { this.interval = new DayInterval(); gantt.redraw(); },
@@ -86,34 +88,55 @@ define(function(require) {
             this.redraw();
         },
 
-        add: function(models, options) {
+        add: function(model) { //, options) {
             var gantt = this;
+            var settings = this.get('settings')
 
-            if (models.length) {
-                // Add the gantt attribute to each model.
-                _.each(models, function(m) {
-                    if (!m.has('gantt')) {
-                        m.set('gantt', gantt);
-                    }
+            if (!model.has('gantt'))
+                model.set('gantt', gantt);
+
+            var path = model.get('path').slice(0);
+            var parent;
+            var search = this.get('data').models;
+            var component;
+
+            // Iterate through every element path component to work down the task tree.
+            while (path.length) {
+                component = path.shift();
+
+                parent = _.find(search, function(t) {
+                    return t.get('name') === component;
                 });
 
-                this.get('data').add(models, _.defaults(options || {}, {silent: true}));
-                this.redraw();
-            }
-            else {
-                if (!models.has('gantt'))
-                    models.set('gantt', gantt);
+                if (!parent) {
+                    throw 'Component "' + component + '" in path "' + model.get('path') + '" does not exist'
+                }
 
-                this.get('data').add(models, options);
+                search = parent.get('tasks');
             }
+
+            // Add the task to the parent.
+            model.set('parent', parent);
+            search.push(model);
+        },
+
+        flattenTree: function(tasks) {
+            var data = [];
+
+            _.each(tasks, function(t) {
+                data.push(t);
+                data.push(this.flattenTree(t.get('tasks')));
+            }, this);
+
+            return _.chain(data).flatten().compact().value();
         },
 
         redraw: function() {
             var parent = this.get('selection');
-            var data = this.get('data');
+            var data = this.flattenTree(this.get('data').models);
 
             // Get the data for this new redraw.
-            var selection = parent.selectAll('tr.row').data(_.filter(data.models, function(cd,ci) {
+            var selection = parent.selectAll('tr.row').data(_.filter(data, function(cd,ci) {
                 return cd.get('visible');
             }), Task.prototype.accessor('id'));
 

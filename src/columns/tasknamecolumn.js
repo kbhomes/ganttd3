@@ -22,10 +22,13 @@ define(function(require) {
                 .attr('class', Task.prototype.method('getIndentClass'))
                 .classed(rowName + '-indent', true)
 
-            group.filter(Task.prototype.accessor('group'))
+            group
                 .append('span').classed(rowName + '-show-hide', true)
                 .text(Task.prototype.method('getRowHidden'))
                 .style('font-weight', Task.prototype.method('getRowFontWeight'))
+                .style('visibility', 'hidden')
+                .filter(Task.prototype.accessor('group'))
+                .style('visibility', 'visible')
                 .on('click', function(d,i) {
                     d.toggleChildren();
                     d3.select(this).text(d.getRowHidden());
@@ -47,13 +50,11 @@ define(function(require) {
                     var children;
 
                     if (d.get('parent')) {
-                        // Get the parent task.
-                        var parent = gantt.get('data').get(d.get('parent'));
-                        var children = parent.getChildren(/* directOnly = */ true);
+                        children = d.get('parent').getChildren(true);
                     }
                     else {
                         children = {
-                            children: gantt.get('data').filter(function(d) { return !d.get('parent'); })
+                            children: gantt.get('data').models
                         }
                     }
 
