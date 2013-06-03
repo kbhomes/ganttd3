@@ -5,6 +5,7 @@ $row-hover-background-color: #FFFFBB;
 
 $group-bar-height: 7px;
 $group-bar-color: black;
+$group-bar-act-color: #AAA;
 
 $indent-width: 20px;
 
@@ -79,6 +80,13 @@ td.row-name {
     &.indent1 { width: $indent-width; }
     &.indent2 { width: $indent-width * 2; }
     &.indent3 { width: $indent-width * 3; }
+    &.indent4 { width: $indent-width * 4; }
+    &.indent5 { width: $indent-width * 5; }
+    &.indent6 { width: $indent-width * 6; }
+    &.indent7 { width: $indent-width * 7; }
+    &.indent8 { width: $indent-width * 8; }
+    &.indent9 { width: $indent-width * 9; }
+    &.indent10 { width: $indent-width * 10; }
   }
 
   .row-name-show-hide {
@@ -94,7 +102,7 @@ td.row-name {
     margin-left: 5px;
     color: #888;
     cursor: pointer;
-    float: right;
+    //float: right;
   }
 }
 
@@ -141,6 +149,16 @@ td.row-bars {
           border-style: solid;
           border-width: 2px;
           border-color: $group-bar-color $group-bar-color transparent transparent; /* Top and right black, bottom and left transparent */
+        }
+      }
+
+      .row-bars-act-full {
+        &:before {
+          border-color: $group-bar-act-color transparent transparent $group-bar-act-color; /* Top and left grey, bottom and right transparent */
+        }
+
+        &:after {
+          border-color: $group-bar-act-color $group-bar-act-color transparent transparent; /* Top and right grey, bottom and left transparent */
         }
       }
     }

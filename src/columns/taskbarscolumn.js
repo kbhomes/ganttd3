@@ -86,7 +86,7 @@ define(function(require) {
             var estBars = bars.append('div').classed(rowName + '-est', true)
                 .classed('bar', true)
                 .style('left', function(d,i) { return estScaleX(d) + 'px'; })
-                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2) + 'px'; });
+                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 - 2) + 'px'; });
 
             var estBarsFull = estBars.append('div').classed(rowName + '-est-full', true)
                 .style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
@@ -103,10 +103,11 @@ define(function(require) {
             var actScaleX = function(d) { return scaleX(d.get('actStartDate')); };
             var actScaleWidth = function(d) { return scaleWidth(d.get('actStartDate'), d.get('actEndDate')); };
 
-            var actBars = bars.append('div').classed(rowName + '-act', true)
+            var actBars = bars.filter(function(d) { return d.get('actStartDate') && d.get('actEndDate'); })
+                .append('div').classed(rowName + '-act', true)
                 .classed('bar', true)
                 .style('left', function(d,i) { return actScaleX(d) + 'px'; })
-                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 + settings.barHeight) + 'px'; });
+                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 + settings.barHeight - 1) + 'px'; });
 
             var actBarsFull = actBars.append('div').classed(rowName + '-act-full', true)
                 .style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
