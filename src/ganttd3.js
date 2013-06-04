@@ -22,6 +22,8 @@ define(function(require) {
             Base.apply(this);
             var gantt = this;
 
+            var _color = d3.scale.category10();
+
             // Create our settings object.
             var settings = _.defaults(customSettings || {}, {
                 rowHeight: 25, // ganttd3.scss, line 1 - $row-height
@@ -31,6 +33,10 @@ define(function(require) {
                 groupCompletionHeight: 3,
 
                 pathSeparator: '.',
+
+                colorGenerator: function(d) {
+                    return _color(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
+                },
 
                 interval: new WeekInterval(),
 

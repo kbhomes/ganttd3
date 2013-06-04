@@ -16,7 +16,6 @@ define(function(require) {
             estEndDate: null,
             actStartDate: null,
             actEndDate: null,
-            color: '',
             completed: 0.00,
             collapsed: false,
             visible: true,
@@ -26,7 +25,15 @@ define(function(require) {
         get: function(attr) {
             var value = Backbone.Model.prototype.get.call(this, attr);
 
-            if (typeof value == 'function' && (attr == 'group' || attr == 'estStartDate' || attr == 'estEndDate' || attr == 'actStartDate' || attr == 'actEndDate')) {
+            if (typeof value == 'function' && (
+                    attr == 'group' ||
+                    attr == 'estStartDate' ||
+                    attr == 'estEndDate' ||
+                    attr == 'actStartDate' ||
+                    attr == 'actEndDate' ||
+                    attr == 'color'
+                ))
+            {
                 return value.call(this);
             }
             else {
@@ -37,10 +44,13 @@ define(function(require) {
         initialize: function() {
             this.set('tasks', []);
 
+            var gantt, settings;
             var pathSeparator = '/';
 
             if (this.get('gantt')) {
-                pathSeparator = this.get('gantt').get('settings').pathSeparator;
+                gantt = this.get('gantt');
+                settings = gantt.get('settings');
+                pathSeparator = settings.pathSeparator;
             }
 
             // Parse an ID path into its components.
@@ -101,6 +111,19 @@ define(function(require) {
                 else
                     return this.get('_actEndDate');
             });
+
+            this.set('_color', this.get('color'));
+            this.set('color', function() {
+                if (this.get('_color'))
+                    return this.get('_color');
+
+                if (settings && typeof settings.colorGenerator == 'function') {
+                    return settings.colorGenerator(this);
+                }
+                else {
+                    return undefined;
+                }
+            });
         },
 
         getEstDuration: function() {
@@ -142,8 +165,8 @@ define(function(require) {
         getBarColor: function() {
             var rgb;
 
-            if (!this.get('group') && this.get('color').length) {
-                rgb = d3.rgb('#' + this.get('color'));
+            if (!this.get('group') && this.get('color')) {
+                rgb = d3.rgb(this.get('color'));
             }
             else {
                 rgb = d3.rgb('black');
@@ -182,8 +205,8 @@ define(function(require) {
         getBarCompletionColor: function() {
             var rgb;
 
-            if (!this.get('group') && this.get('color').length) {
-                rgb = d3.rgb('#' + this.get('color')).darker(1);
+            if (!this.get('group') && this.get('color')) {
+                rgb = d3.rgb(this.get('color')).darker(1);
             }
             else {
                 rgb = d3.rgb('#555');
