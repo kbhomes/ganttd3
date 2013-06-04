@@ -83,7 +83,8 @@ define(function(require) {
             var estScaleX = function(d) { return scaleX(d.get('estStartDate')); };
             var estScaleWidth = function(d) { return scaleWidth(d.get('estStartDate'), d.get('estEndDate')); };
 
-            var estBars = bars.append('div').classed(rowName + '-est', true)
+            var estBars = bars.filter(function(d) { return d.get('estStartDate') && d.get('estEndDate'); })
+                .append('div').classed(rowName + '-est', true)
                 .classed('bar', true)
                 .style('left', function(d,i) { return estScaleX(d) + 'px'; })
                 .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 - 2) + 'px'; });

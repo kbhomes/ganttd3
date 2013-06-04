@@ -12,10 +12,10 @@ define(function(require) {
             name: '',
             path: [],
             number: '',
-            estStartDate: new Date(),
-            estEndDate: new Date(),
-            actStartDate: new Date(),
-            actEndDate: new Date(),
+            estStartDate: null,
+            estEndDate: null,
+            actStartDate: null,
+            actEndDate: null,
             color: '',
             completed: 0.00,
             collapsed: false,
@@ -26,7 +26,7 @@ define(function(require) {
         get: function(attr) {
             var value = Backbone.Model.prototype.get.call(this, attr);
 
-            if (typeof value == 'function' && (attr == 'group' || attr == 'actStartDate' || attr == 'actEndDate')) {
+            if (typeof value == 'function' && (attr == 'group' || attr == 'estStartDate' || attr == 'estEndDate' || attr == 'actStartDate' || attr == 'actEndDate')) {
                 return value.call(this);
             }
             else {
@@ -48,18 +48,43 @@ define(function(require) {
                 return this.get('forceGroup') || this.get('tasks').length > 0;
             });
 
+            this.set('_estStartDate', this.get('estStartDate'));
+            this.set('estStartDate', function() {
+                if (this.get('forceEstStartDate'))
+                    return this.get('_estStartDate');
+
+                if (this.get('group'))
+                    return d3.min(this.get('tasks'), function(t) { return t.get('estStartDate'); });
+                else
+                    return this.get('_estStartDate');
+            });
+
+            this.set('_estEndDate', this.get('estEndDate'));
+            this.set('estEndDate', function() {
+                if (this.get('forceEstEndDate'))
+                    return this.get('_estEndDate');
+
+                if (this.get('group'))
+                    return d3.max(this.get('tasks'), function(t) { return t.get('estEndDate'); });
+                else
+                    return this.get('_estEndDate');
+            });
+
             this.set('_actStartDate', this.get('actStartDate'));
             this.set('actStartDate', function() {
-                return this.get('forceActStartDate') ||
-                    this.get('group') ?
-                        d3.min(this.get('tasks'), function(t) { return t.get('actStartDate'); }) :
-                        this.get('_actStartDate');
+                if (this.get('forceActStartDate'))
+                    return this.get('_actStartDate');
+
+                if (this.get('group'))
+                    return d3.min(this.get('tasks'), function(t) { return t.get('actStartDate'); });
+                else
+                    return this.get('_actStartDate');
             });
 
             this.set('_actEndDate', this.get('actEndDate'));
             this.set('actEndDate', function() {
                 if (this.get('forceActEndDate'))
-                    return this.get('forceActEndDate');
+                    return this.get('_actEndDate');
 
                 if (this.get('group')) {
                     if (_.every(this.get('tasks'), function(t) { return t.get('actEndDate'); }))
@@ -73,6 +98,9 @@ define(function(require) {
         },
 
         getEstDuration: function() {
+            if (!this.get('estStartDate') || !this.get('estEndDate'))
+                return '';
+
             var days = ((this.get('estEndDate') - this.get('estStartDate')) / (1000 * 60 * 60 * 24) + 1);
             return days + (days == 1 ? ' day' : ' days');
         },
