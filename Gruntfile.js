@@ -4,6 +4,22 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
+        watch: {
+            options: {
+                nospawn: true
+            },
+
+            scripts: {
+                files: ['lib/**/*.js', 'src/**/*.js'],
+                tasks: ['requirejs']
+            },
+
+            stylesheets: {
+                files: ['src/**/*.scss'],
+                tasks: ['sass']
+            }
+        },
+
         requirejs: {
             compile: {
                 options: {
@@ -56,6 +72,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Load the plugin that provides the "clean" task.
     grunt.loadNpmTasks('grunt-contrib-clean');
