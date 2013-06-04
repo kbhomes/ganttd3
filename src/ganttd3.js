@@ -88,6 +88,13 @@ define(function(require) {
             this.redraw();
         },
 
+        createTask: function(options) {
+            options = options || {}
+            options.gantt = this;
+
+            return new Task(options);
+        },
+
         add: function(model) { //, options) {
             var gantt = this;
             var settings = this.get('settings')
