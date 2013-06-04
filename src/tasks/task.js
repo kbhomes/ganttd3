@@ -37,8 +37,14 @@ define(function(require) {
         initialize: function() {
             this.set('tasks', []);
 
+            var pathSeparator = '/';
+
+            if (this.get('gantt')) {
+                pathSeparator = this.get('gantt').get('settings').pathSeparator;
+            }
+
             // Parse an ID path into its components.
-            var path = this.get('id').split('/');
+            var path = this.get('id').split(pathSeparator);
             var name = path.pop();
 
             this.set('path', path)

@@ -30,7 +30,7 @@ define(function(require) {
                 barCompletionHeight: 5,
                 groupCompletionHeight: 3,
 
-                pathSeparator: '/',
+                pathSeparator: '.',
 
                 interval: new WeekInterval(),
 
