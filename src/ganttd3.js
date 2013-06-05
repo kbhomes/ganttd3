@@ -13,6 +13,8 @@ define(function(require) {
         WeekInterval = require('intervals/weekinterval'),
         MonthInterval = require('intervals/monthinterval'),
 
+        Colors = require('util/colors'),
+
         d3 = require('d3'),
         _ = require('underscore');
 
@@ -21,8 +23,6 @@ define(function(require) {
             // Call our super constructor.
             Base.apply(this);
             var gantt = this;
-
-            var _color = d3.scale.category10();
 
             // Create our settings object.
             var settings = _.defaults(customSettings || {}, {
@@ -38,7 +38,7 @@ define(function(require) {
                     if (d.get('group'))
                         return { bar: 'black', completion: '#555' };
                     else {
-                        var color = _color(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
+                        var color = Colors.lights(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
                         return { bar: color, completion: d3.rgb(color).brighter().toString() };
                     }
                 },
