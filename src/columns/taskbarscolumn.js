@@ -151,8 +151,20 @@ define(function(require) {
                     c.renderPopupData(table, d);
                 });
 
-                popup.style('display', 'block')
-                    .style('left', m[0] + 'px')
+                popup.style('display', 'block');
+
+                // Figure out if this popup is extending past the edge of the window and needs to be relocated.
+                var width = popup.node().clientWidth;
+                var height = popup.node().clientHeight;
+                var windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                var windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+                if (e.clientX + width + 30 > windowWidth)
+                    m[0] -= width + 10;
+                if (e.clientY + height + 30 > windowHeight)
+                    m[1] -= height + 10;
+
+                popup.style('left', m[0] + 'px')
                     .style('top', m[1] + 'px');
             };
         },
