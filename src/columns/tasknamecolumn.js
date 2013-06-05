@@ -22,8 +22,7 @@ define(function(require) {
                 .attr('class', Task.prototype.method('getIndentClass'))
                 .classed(rowName + '-indent', true)
 
-            group
-                .append('span').classed(rowName + '-show-hide', true)
+            group.append('span').classed(rowName + '-show-hide', true)
                 .text(Task.prototype.method('getRowHidden'))
                 .style('font-weight', Task.prototype.method('getRowFontWeight'))
                 .style('visibility', 'hidden')
@@ -31,7 +30,6 @@ define(function(require) {
                 .style('visibility', 'visible')
                 .on('click', function(d,i) {
                     d.toggleChildren();
-                    d3.select(this).text(d.getRowHidden());
                     gantt.redraw();
                 });
 
@@ -44,30 +42,11 @@ define(function(require) {
                 });
 
             group.filter(Task.prototype.accessor('group'))
-                .append('a').classed(rowName + '-focus', true)
-                .text('[focus]')
+                .append('a').classed(rowName + '-collapse-all', true)
+                .text('[collapse all]')
                 .on('click', function(d,i) {
-                    var children;
-
-                    if (d.get('parent')) {
-                        children = d.get('parent').getChildren(true);
-                    }
-                    else {
-                        children = {
-                            children: gantt.get('data').models
-                        }
-                    }
-
-                    // Go through each task on this same level.
-                    _.each(children.children, function(cd,ci) {
-                        if (d.get('id') == cd.get('id')) {
-                            if (d.get('collapsed'))
-                                d.toggleChildren();
-
-                            return;
-                        }
-
-                        if (!cd.get('collapsed'))
+                    _.each(d.get('tasks'), function(cd,ci) {
+                        if (cd.get('group') && !cd.get('collapsed'))
                             cd.toggleChildren();
                     });
                 });
