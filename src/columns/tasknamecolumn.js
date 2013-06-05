@@ -35,6 +35,12 @@ define(function(require) {
 
             group.append('span').classed(rowName + '-name', true)
                 .text(Task.prototype.accessor('name'))
+                .attr('title', function(d) {
+                    if (d.get('description'))
+                        return d.get('description');
+                    else
+                        return d.get('name');
+                })
                 .style('font-weight', Task.prototype.method('getRowFontWeight'))
                 .on('click', function(d,i) {
                     if (settings.linkCallback)
