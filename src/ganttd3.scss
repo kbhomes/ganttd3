@@ -209,39 +209,3 @@ td.row-bars {
     border-color: rgba(0, 0, 0, 0);
   }
 }
-
-.todo {
-  font-size: 12px;
-
-  .title {
-    font-weight: bold;
-    text-transform: uppercase;
-    display: block;
-    margin-top: 20px;
-  }
-
-  ul {
-    list-style-type: none;
-    padding-left: 20px;
-  }
-
-  li {
-    line-height: 20px;
-
-    &:before {
-      content: "\2610";
-      margin-right: 5px;
-    }
-
-    &.completed {
-      &:before {
-        content: "\2611";
-        margin-right: 5px;
-      }
-
-      span {
-        text-decoration: line-through;
-      }
-    }
-  }
-}
