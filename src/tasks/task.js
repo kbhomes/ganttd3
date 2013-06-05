@@ -56,10 +56,10 @@ define(function(require) {
 
             // Parse an ID path into its components.
             var path = this.get('id').split(pathSeparator);
-            var name = path.pop();
+            var pathName = path.pop();
 
             this.set('path', path)
-            this.set('name', name);
+            this.set('pathName', pathName);
 
             this.set('group', function() {
                 return this.get('forceGroup') || this.get('tasks').length > 0;

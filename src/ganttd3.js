@@ -123,7 +123,7 @@ define(function(require) {
                 component = path.shift();
 
                 parent = _.find(search, function(t) {
-                    return t.get('name') === component;
+                    return t.get('pathName') === component;
                 });
 
                 if (!parent) {
