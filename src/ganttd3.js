@@ -35,7 +35,12 @@ define(function(require) {
                 pathSeparator: '.',
 
                 colorGenerator: function(d) {
-                    return _color(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
+                    if (d.get('group'))
+                        return { bar: 'black', completion: '#555' };
+                    else {
+                        var color = _color(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
+                        return { bar: color, completion: d3.rgb(color).darker().toString() };
+                    }
                 },
 
                 interval: new WeekInterval(),

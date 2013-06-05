@@ -163,16 +163,7 @@ define(function(require) {
         },
 
         getBarColor: function() {
-            var rgb;
-
-            if (!this.get('group') && this.get('color')) {
-                rgb = d3.rgb(this.get('color'));
-            }
-            else {
-                rgb = d3.rgb('black');
-            }
-
-            return rgb.toString();
+            return this.get('color').bar;
         },
 
         getBarHeight: function() {
@@ -203,16 +194,7 @@ define(function(require) {
         },
 
         getBarCompletionColor: function() {
-            var rgb;
-
-            if (!this.get('group') && this.get('color')) {
-                rgb = d3.rgb(this.get('color')).darker(1);
-            }
-            else {
-                rgb = d3.rgb('#555');
-            }
-
-            return rgb.toString();
+            return this.get('color').completion;
         },
 
         getRowHidden: function() {
