@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         render: function(selection) {
-            var rowName = 'row-' + this.get('name');
+            var rowName = this.getRowName();
             var gantt = this.get('gantt');
             var settings = gantt.get('settings');
 

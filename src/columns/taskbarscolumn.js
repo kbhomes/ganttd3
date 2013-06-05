@@ -15,7 +15,7 @@ define(function(require) {
         renderHeading: function() { },
 
         render: function(selection) {
-            var rowName = 'row-' + this.get('name');
+            var rowName = this.getRowName();
             var settings = this.get('gantt').get('settings');
 
             if (selection.length) {

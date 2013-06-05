@@ -10,15 +10,23 @@ define(function(require) {
             accessor: null
         },
 
+        getColumnName: function() {
+            return 'column-' + this.get('name');
+        },
+
+        getRowName: function() {
+            return 'row-' + this.get('name');
+        },
+
         renderHeading: function(columns) {
-            var colName = 'column-' + this.get('name');
+            var colName = this.getColumnName();
             columns.append('td').classed(colName, true)
                 .append('span')
                 .text(this.get('label'));
         },
 
         render: function(selection) {
-            var rowName = 'row-' + this.get('name');
+            var rowName = this.getRowName();
 
             // The selection is the enter() selection so this does not need to be stored.
             var group = selection.append('td').classed(rowName, true);
@@ -30,7 +38,7 @@ define(function(require) {
 
         renderPopupData: function(table, data) {
             if (this.get('label') && this.get('accessor')) {
-                var rowName = 'popup-row-' + this.get('name')
+                var rowName = 'popup-' + this.getRowName();
                 var tr = table.append('tr').classed(rowName, true);
 
                 // Append the label and data.
