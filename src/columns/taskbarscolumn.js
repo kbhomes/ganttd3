@@ -131,7 +131,7 @@ define(function(require) {
 
                 var popup = d3.select('.taskpopup');
                 popup.select('.corner').style('border-right-color', d.getBarColor().toString());
-                popup.select('.taskname').text(d.get('number'));
+                popup.select('.taskname').text(d.get('name'));
 
                 var table = popup.select('table.taskdata');
 
