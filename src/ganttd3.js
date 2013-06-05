@@ -29,7 +29,7 @@ define(function(require) {
                 rowHeight: 25, // ganttd3.scss, line 1 - $row-height
                 barHeight: 9,
                 groupHeight: 7, // ganttd3.scss, line 7 - $group-bar-height
-                barCompletionHeight: 5,
+                barCompletionHeight: 3,
                 groupCompletionHeight: 3,
 
                 pathSeparator: '.',
@@ -39,7 +39,7 @@ define(function(require) {
                         return { bar: 'black', completion: '#555' };
                     else {
                         var color = _color(_.reduce(d.get('id').split(''), function(sum, c) { return sum + c.charCodeAt(); }, 0));
-                        return { bar: color, completion: d3.rgb(color).darker().toString() };
+                        return { bar: color, completion: d3.rgb(color).brighter().toString() };
                     }
                 },
 

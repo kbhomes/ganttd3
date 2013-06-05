@@ -31,7 +31,8 @@ define(function(require) {
                     attr == 'estEndDate' ||
                     attr == 'actStartDate' ||
                     attr == 'actEndDate' ||
-                    attr == 'color'
+                    attr == 'color' ||
+                    attr == 'completed'
                 ))
             {
                 return value.call(this);
@@ -64,6 +65,10 @@ define(function(require) {
                 return this.get('forceGroup') || this.get('tasks').length > 0;
             });
 
+            this.initializeComputedProperties(settings);
+        },
+
+        initializeComputedProperties: function(settings) {
             this.set('_estStartDate', this.get('estStartDate'));
             this.set('estStartDate', function() {
                 if (this.get('forceEstStartDate'))
@@ -124,6 +129,33 @@ define(function(require) {
                     return undefined;
                 }
             });
+
+            this.set('_completed', this.get('completed'));
+            this.set('completed', function() {
+                if (this.get('forceCompleted'))
+                    return this.get('_completed');
+
+                if (this.get('group')) {
+                    var children = this.get('tasks');
+                    var comp = d3.mean(_.map(children, function(d) { return d.get('completed'); }));
+                    return comp;
+                }
+                else {
+                    if (!this.get('actStartDate')) {
+                        return undefined;
+                    }
+                    else {
+                        // If there's an end date, the project is completed (100%).
+                        if (this.get('actEndDate')) {
+                            return 100;
+                        }
+                        // Otherwise, show the manually entered completion.
+                        else {
+                            return this.get('_completed');
+                        }
+                    }
+                }
+            });
         },
 
         getEstDuration: function() {
@@ -134,21 +166,17 @@ define(function(require) {
             return days + (days == 1 ? ' day' : ' days');
         },
 
-        getComputedCompletion: function() {
-            if (this.get('group')) {
-                var children = this.get('tasks');
-                var comp = Math.ceil(d3.mean(_.map(children, function(d) { return d.getComputedCompletion(); })));
-
-                return comp;
-            }
-            else {
-                return this.get('completed');
-            }
-        },
-
         getPercentCompletion: function() {
-            if (this.getComputedCompletion())
-                return this.getComputedCompletion().toFixed(0) + '%';
+            if (this.get('completed')) {
+                var comp = this.get('completed');
+
+                if (comp.toFixed(0) == comp)
+                    comp = comp.toFixed(0);
+                else
+                    comp = comp.toFixed(1);
+
+                return comp + '%';
+            }
             else
                 return '';
         },

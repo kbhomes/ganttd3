@@ -97,7 +97,7 @@ define(function(require) {
             var estBarsCompleted = estBars.append('div').classed(rowName + '-est-completed', true)
                 .style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
                 .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
-                .style('width', function(d,i) { return Math.floor(estScaleWidth(d) * (d.getComputedCompletion() / 100)) + 'px'; })
+                .style('width', function(d,i) { return Math.floor(estScaleWidth(d) * (d.get('completed') / 100)) + 'px'; })
                 .style('background-color', Task.prototype.method('getBarCompletionColor'));
 
             // Create the bars that represent the actual completion dates.
@@ -118,7 +118,7 @@ define(function(require) {
             var actBarsCompleted = actBars.append('div').classed(rowName + '-act-completed', true)
                 .style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
                 .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
-                .style('width', function(d,i) { return Math.floor(actScaleWidth(d) * (d.getComputedCompletion() / 100)) + 'px'; })
+                .style('width', function(d,i) { return Math.floor(actScaleWidth(d) * (d.get('completed') / 100)) + 'px'; })
                 .style('background-color', d3.rgb("#AAA").darker().toString());
         },
 
