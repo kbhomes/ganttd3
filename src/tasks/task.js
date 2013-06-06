@@ -25,15 +25,7 @@ define(function(require) {
         get: function(attr) {
             var value = Backbone.Model.prototype.get.call(this, attr);
 
-            if (typeof value == 'function' && (
-                    attr == 'group' ||
-                    attr == 'estStartDate' ||
-                    attr == 'estEndDate' ||
-                    attr == 'actStartDate' ||
-                    attr == 'actEndDate' ||
-                    attr == 'color' ||
-                    attr == 'completed'
-                ))
+            if (typeof value == 'function' && _.indexOf(this.get('_computedProperties'), attr) != -1)
             {
                 return value.call(this);
             }
@@ -61,14 +53,16 @@ define(function(require) {
             this.set('path', path)
             this.set('pathName', pathName);
 
-            this.set('group', function() {
-                return this.get('forceGroup') || this.get('tasks').length > 0;
-            });
-
             this.initializeComputedProperties(settings);
         },
 
         initializeComputedProperties: function(settings) {
+            this.set('_computedProperties', ['group', 'estStartDate', 'estEndDate', 'actStartDate', 'actEndDate', 'color', 'completed']);
+
+            this.set('group', function() {
+                return this.get('forceGroup') || this.get('tasks').length > 0;
+            });
+
             this.set('_estStartDate', this.get('estStartDate'));
             this.set('estStartDate', function() {
                 if (this.get('forceEstStartDate'))
