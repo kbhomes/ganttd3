@@ -34,7 +34,7 @@ define(function(require) {
             };
 
             var updateCell = update.selectAll('td.' + rowName);
-            updateCell.call(_column);
+            updateCell.selectAll('span').call(_column);
 
             var enterCell = enter.append('td').classed(rowName, true);
             enterCell.append('span').call(_column);
