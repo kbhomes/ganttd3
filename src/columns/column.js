@@ -25,15 +25,20 @@ define(function(require) {
                 .text(this.get('label'));
         },
 
-        render: function(selection) {
+        render: function(update, enter) {
             var rowName = this.getRowName();
+            var accessor = this.get('accessor');
 
-            // The selection is the enter() selection so this does not need to be stored.
-            var group = selection.append('td').classed(rowName, true);
+            var _column = function(sel) {
+                sel.text(accessor)
+                    .style('font-weight', Task.prototype.method('getRowFontWeight'));
+            };
 
-            group.append('span')
-                .text(this.get('accessor'))
-                .style('font-weight', Task.prototype.method('getRowFontWeight'));
+            var updateCell = update.selectAll('td.' + rowName);
+            updateCell.call(_column);
+
+            var enterCell = enter.append('td').classed(rowName, true);
+            enterCell.append('span').call(_column);
         },
 
         renderPopupData: function(table, data) {

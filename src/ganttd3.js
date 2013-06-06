@@ -153,25 +153,32 @@ define(function(require) {
             var parent = this.get('selection');
             var data = this.flattenTree(this.get('data').models);
 
+            var _row = function(sel) {
+                sel.classed('group', Task.prototype.accessor('group'));
+            };
+
             // Get the data for this new redraw.
             var selection = parent.selectAll('tr.row').data(_.filter(data, function(cd,ci) {
                 return cd.get('visible');
             }), Task.prototype.accessor('id'));
 
+            // Update the current rows.
+            selection.call(_row);
+
             // Remove the non-existent rows.
             var exit = selection.exit().remove();
 
-            var enter = selection.enter();
-
             // Create a row for every piece of data.
-            var tasks = enter.append('tr').classed('row', true)
-                .classed('group', Task.prototype.accessor('group'));
+            var enter = selection.enter();
+            var rows = enter.append('tr')
+                .classed('row', true)
+                .call(_row);
 
             // Reorder the elements so that any newly inserted elements are back where they belong.
             selection.order();
 
             // Render the columns.
-            this.drawColumns(tasks);
+            this.drawColumns(selection, rows);
         },
 
         drawColumnHeadings: function(columnsRow) {
@@ -180,9 +187,9 @@ define(function(require) {
             })
         },
 
-        drawColumns: function(texts) {
+        drawColumns: function(update, enter) {
             _.each(this.get('columns'), function(c) {
-                c.render(texts);
+                c.render(update, enter);
             });
         }
     });

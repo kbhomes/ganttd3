@@ -14,11 +14,11 @@ define(function(require) {
 
         renderHeading: function() { },
 
-        render: function(selection) {
+        render: function(update, enter) {
             var rowName = this.getRowName();
             var settings = this.get('gantt').get('settings');
 
-            if (selection.length) {
+            if (enter.length) {
                 // There is new data coming in, so remove all the date ranges,
                 // day cells, and bars. We'll be adding that again later.
                 d3.selectAll('td.date-range').remove();
