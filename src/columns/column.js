@@ -30,8 +30,7 @@ define(function(require) {
             var accessor = this.get('accessor');
 
             var _column = function(sel) {
-                sel.text(accessor)
-                    .style('font-weight', Task.prototype.method('getRowFontWeight'));
+                sel.text(accessor);
             };
 
             var updateCell = update.selectAll('td.' + rowName);

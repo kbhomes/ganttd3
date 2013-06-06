@@ -154,7 +154,8 @@ define(function(require) {
             var data = this.flattenTree(this.get('data').models);
 
             var _row = function(sel) {
-                sel.classed('group', Task.prototype.accessor('group'));
+                sel.classed('group', Task.prototype.accessor('group'))
+                    .style('font-weight', Task.prototype.method('getRowFontWeight'));
             };
 
             // Get the data for this new redraw.

@@ -22,7 +22,6 @@ define(function(require) {
 
             var _showHide = function(sel) {
                 sel.text(Task.prototype.method('getRowHidden'))
-                    .style('font-weight', Task.prototype.method('getRowFontWeight'))
                     .style('visibility', 'hidden')
                     .filter(Task.prototype.accessor('group'))
                     .style('visibility', 'visible')
@@ -40,7 +39,6 @@ define(function(require) {
                         else
                             return d.get('name');
                     })
-                    .style('font-weight', Task.prototype.method('getRowFontWeight'))
                     .on('click', function(d,i) {
                         if (settings.linkCallback)
                             settings.linkCallback.call(this, d, i);
