@@ -1,6 +1,16 @@
 define(function(require) {
     var Base = require('util/base'),
         Util = require('util/util'),
+
+        ComputedAttribute = require('util/computedattribute'),
+        GroupAttribute = require('tasks/attributes/groupattribute'),
+        EstStartDateAttribute = require('tasks/attributes/eststartdateattribute'),
+        EstEndDateAttribute = require('tasks/attributes/estenddateattribute'),
+        ActStartDateAttribute = require('tasks/attributes/actstartdateattribute'),
+        ActEndDateAttribute = require('tasks/attributes/actenddateattribute'),
+        ColorAttribute = require('tasks/attributes/colorattribute'),
+        CompletedAttribute = require('tasks/attributes/completedattribute'),
+
         d3 = require('d3'),
         _ = require('underscore'),
         Backbone = require('backbone');
@@ -25,12 +35,22 @@ define(function(require) {
         get: function(attr) {
             var value = Backbone.Model.prototype.get.call(this, attr);
 
-            if (typeof value == 'function' && _.indexOf(this.get('_computedProperties'), attr) != -1)
-            {
-                return value.call(this);
+            if (value instanceof ComputedAttribute) {
+                return value.get();
             }
             else {
                 return value;
+            }
+        },
+
+        set: function(attr, value) {
+            var target = Backbone.Model.prototype.get.call(this, attr);
+
+            if (target instanceof ComputedAttribute) {
+                target.set(value)
+            }
+            else {
+                Backbone.Model.prototype.set.call(this, attr, value);
             }
         },
 
@@ -57,99 +77,13 @@ define(function(require) {
         },
 
         initializeComputedProperties: function(settings) {
-            this.set('_computedProperties', ['group', 'estStartDate', 'estEndDate', 'actStartDate', 'actEndDate', 'color', 'completed']);
-
-            this.set('group', function() {
-                return this.get('forceGroup') || this.get('tasks').length > 0;
-            });
-
-            this.set('_estStartDate', this.get('estStartDate'));
-            this.set('estStartDate', function() {
-                if (this.get('forceEstStartDate'))
-                    return this.get('_estStartDate');
-
-                if (this.get('group'))
-                    return d3.min(this.get('tasks'), function(t) { return t.get('estStartDate'); });
-                else
-                    return this.get('_estStartDate');
-            });
-
-            this.set('_estEndDate', this.get('estEndDate'));
-            this.set('estEndDate', function() {
-                if (this.get('forceEstEndDate'))
-                    return this.get('_estEndDate');
-
-                if (this.get('group'))
-                    return d3.max(this.get('tasks'), function(t) { return t.get('estEndDate'); });
-                else
-                    return this.get('_estEndDate');
-            });
-
-            this.set('_actStartDate', this.get('actStartDate'));
-            this.set('actStartDate', function() {
-                if (this.get('forceActStartDate'))
-                    return this.get('_actStartDate');
-
-                if (this.get('group'))
-                    return d3.min(this.get('tasks'), function(t) { return t.get('actStartDate'); });
-                else
-                    return this.get('_actStartDate');
-            });
-
-            this.set('_actEndDate', this.get('actEndDate'));
-            this.set('actEndDate', function() {
-                if (this.get('forceActEndDate'))
-                    return this.get('_actEndDate');
-
-                if (this.get('group')) {
-                    if (_.every(this.get('tasks'), function(t) { return t.get('actEndDate'); }))
-                        return d3.max(this.get('tasks'), function(t) { return t.get('actEndDate'); });
-                    else
-                        return undefined;
-                }
-                else
-                    return this.get('_actEndDate');
-            });
-
-            this.set('_color', this.get('color'));
-            this.set('color', function() {
-                if (this.get('_color'))
-                    return this.get('_color');
-
-                if (settings && typeof settings.colorGenerator == 'function') {
-                    return settings.colorGenerator(this);
-                }
-                else {
-                    return undefined;
-                }
-            });
-
-            this.set('_completed', this.get('completed'));
-            this.set('completed', function() {
-                if (this.get('forceCompleted'))
-                    return this.get('_completed');
-
-                if (this.get('group')) {
-                    var children = this.get('tasks');
-                    var comp = d3.mean(_.map(children, function(d) { return d.get('completed'); }));
-                    return comp;
-                }
-                else {
-                    if (!this.get('actStartDate')) {
-                        return undefined;
-                    }
-                    else {
-                        // If there's an end date, the project is completed (100%).
-                        if (this.get('actEndDate')) {
-                            return 100;
-                        }
-                        // Otherwise, show the manually entered completion.
-                        else {
-                            return this.get('_completed');
-                        }
-                    }
-                }
-            });
+            this.set('group', GroupAttribute.create(this));
+            this.set('estStartDate', EstStartDateAttribute.create(this));
+            this.set('estEndDate', EstEndDateAttribute.create(this));
+            this.set('actStartDate', ActStartDateAttribute.create(this));
+            this.set('actEndDate', ActEndDateAttribute.create(this));
+            this.set('color', ColorAttribute.create(this));
+            this.set('completed', CompletedAttribute.create(this));
         },
 
         getEstDuration: function() {
