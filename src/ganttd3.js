@@ -83,7 +83,7 @@ define(function(require) {
                 .style('opacity', 1);
 
             //  This cell will cover all but the last (task bars) column.
-            var rangesFillerCell = rangesRow.append('td').attr('colspan', columns.length - 1);
+            var rangesFillerCell = rangesRow.append('td').classed('spacer', true).attr('colspan', columns.length - 1);
 
             // Draw our columns.
             var columnsRow = table.append('tr')
