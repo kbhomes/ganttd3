@@ -92,6 +92,9 @@ td.row-name {
   .row-name-show-hide {
     cursor: pointer;
     padding: 0px 5px;
+    width: 0.75em;
+    display: inline-block;
+    text-align: center;
   }
 
   .row-name-name {
