@@ -64,6 +64,7 @@ define(function(require) {
                             if (cd.get('group') && !cd.get('collapsed'))
                                 cd.toggleChildren();
                         });
+                        gantt.redraw();
                     });
             };
 

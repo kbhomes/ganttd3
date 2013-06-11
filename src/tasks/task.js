@@ -213,9 +213,6 @@ define(function(require) {
                     }
                 });
             }
-
-            if (first == true)
-                gantt.redraw();
         },
 
         toString: function() {
