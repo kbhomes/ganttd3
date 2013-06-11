@@ -20,16 +20,13 @@ define(function(require) {
         defaults: {
             id: '',
             name: '',
-            path: [],
-            number: '',
             estStartDate: null,
             estEndDate: null,
             actStartDate: null,
             actEndDate: null,
             completed: 0.00,
             collapsed: false,
-            visible: true,
-            caption: ''
+            visible: true
         },
 
         get: function(attr) {

@@ -46,7 +46,12 @@ define(function(require) {
             };
 
             var _collapseAll = function(sel) {
-                var filtered = sel.filter(Task.prototype.accessor('group'));
+                var filtered =
+                    sel
+                        .filter(Task.prototype.accessor('group'))
+                        .filter(function(d,i) {
+                            return _.some(d.get('tasks'), Task.prototype.accessor('group'));
+                        });
 
                 // Remove the links that are already there (if this is the enter selection, there will be no links).
                 filtered.selectAll('a').remove();
