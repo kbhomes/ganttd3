@@ -32,9 +32,13 @@ define(function(require) {
             return this.get('unitInterval').range.apply(undefined, this.get('domain'));
         },
 
+        getGroupSteps: function() {
+            return this.get('groupInterval').range.apply(undefined, this.get('domain'));
+        },
+
         getGroupText: function(start) { },
 
-        appendGroupCell: function(d,i,ranges) { },
+        appendGroupCell: function(sel) { },
 
         getUnitText: function(date) { },
 

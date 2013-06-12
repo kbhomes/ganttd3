@@ -18,14 +18,53 @@ define(function(require) {
             var rowName = this.getRowName();
             var settings = this.get('gantt').get('settings');
 
-            if (enter.length) {
-                // There is new data coming in, so remove all the date ranges,
-                // day cells, and bars. We'll be adding that again later.
-                d3.selectAll('td.date-range').remove();
-                d3.selectAll('td.day-cell').remove();
-                d3.selectAll('td.' + rowName).remove();
-            }
+            var _bars = function(sel) {
+            };
 
+            var _estBars = function(sel, scale) {
+                sel.style('left', function(d,i) { return scale(d) + 'px'; })
+                    .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 - 2) + 'px'; });
+            };
+
+            var _estBarsFull = function(sel, scale) {
+                sel.style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
+                    .style('width', function(d,i) { return Math.floor(scale(d))  + 'px'; })
+                    .style('background-color', Task.prototype.method('getBarColor'));
+            };
+
+            var _estBarsCompleted = function(sel, scale) {
+                sel.style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
+                    .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
+                    .style('width', function(d,i) { return Math.floor(scale(d) * (d.get('completed') / 100)) + 'px'; })
+                    .style('background-color', Task.prototype.method('getBarCompletionColor'));
+            };
+
+            var _actBars = function(sel, scale) {
+                sel.style('left', function(d,i) { return scale(d) + 'px'; })
+                    .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 + settings.barHeight - 1) + 'px'; });
+            };
+
+            var _actBarsFull = function(sel, scale) {
+                sel.style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
+                    .style('width', function(d,i) { return Math.floor(scale(d))  + 'px'; })
+                    .style('background-color', d3.rgb("#AAA").toString());
+            };
+
+            var _actBarsCompleted = function(sel, scale) {
+                sel.style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
+                    .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
+                    .style('width', function(d,i) { return Math.floor(scale(d) * (d.get('completed') / 100)) + 'px'; })
+                    .style('background-color', d3.rgb("#AAA").darker().toString());
+            };
+
+//            if (enter.length) {
+//                // There is new data coming in, so remove all the date ranges,
+//                // day cells, and bars. We'll be adding that again later.
+//                d3.selectAll('td.date-range').remove();
+//                d3.selectAll('td.day-cell').remove();
+//                d3.selectAll('td.' + rowName).remove();
+//            }
+//
             var selection = d3.select('table').selectAll('tr.row');
             var data = selection.data();
 
@@ -37,89 +76,179 @@ define(function(require) {
             // This scale is for computing the positions/widths of the bars.
             var min = Math.min.apply(Math, _.filter([interval.getMinGroup(data, 'estStartDate'), interval.getMinGroup(data, 'actStartDate')], _.identity))
             var max = Math.max.apply(Math, _.filter([interval.getMaxGroup(data, 'estEndDate'), interval.getMaxGroup(data, 'actEndDate')], _.identity));
+
             var domain = [min, max];
             interval.setDomain(domain);
-            var steps = interval.getUnitSteps();
-            var maxWidth = steps.length * interval.get('unitWidth');
+
+            var unitSteps = interval.getUnitSteps();
+            var groupSteps = interval.getGroupSteps();
+            var maxWidth = unitSteps.length * interval.get('unitWidth');
             interval.setRange([0, maxWidth]);
 
             var scaleX = interval.getXScale();
             var scaleWidth = interval.getWidthScale();
 
-            var ranges = d3.select('tr.date-ranges');
+            var ranges = d3.select('tr.date-ranges').selectAll('td.date-range').data(groupSteps, _.identity);
+            var columns = d3.select('tr.columns').selectAll('td.day-cell').data(unitSteps, _.identity);
 
-            _.each(steps, function(d,i) {
-                interval.appendGroupCell(d, i, ranges);
+            // Update selection
+            {
+                // Create a cell to span the whole bars area.
+                var cell = update.selectAll('td.' + rowName).attr('colspan', unitSteps.length);
+                var group = cell.selectAll('div.' + rowName + '-container');
+                var overlay = group.selectAll('div.overlay');
+                var bars = group.selectAll('div.' + rowName + '-bars');
 
-                var cols = d3.select('tr.columns');
-                var background = interval.getUnitBackgroundColor(d,i);
+                // Create the bars that represent the estimated completion dates.
+                var estScaleX = function(d) { return scaleX(d.get('estStartDate')); };
+                var estScaleWidth = function(d) { return scaleWidth(d.get('estStartDate'), d.get('estEndDate')); };
 
-                var colCells = cols.append('td').classed('day-cell', true);
-                var colDivs = colCells.append('div').classed('inner', true).style('width', Util.plusPx(interval.get('unitCellWidth')));
-                var colDays = colDivs.append('div')
-                    .classed('background', true)
-                    .style('background-color', background)
+                // Remove estimate date bars if either estStartDate or estEndDate don't exist.
+                bars.selectAll('div.bar.' + rowName + '-est').filter(function(d) { return !d.get('estStartDate') || !d.get('estEndDate'); }).remove();
+
+                var estBars = bars
+                    .filter(function(d) { return d.get('estStartDate') && d.get('estEndDate'); })
+                    .selectAll('div.bar.' + rowName + '-est')
+                    .call(_estBars, estScaleX);
+
+                var estBarsFull = estBars
+                    .selectAll('div.' + rowName + '-est-full')
+                    .call(_estBarsFull, estScaleWidth);
+
+                var estBarsCompleted = estBars
+                    .selectAll('div.' + rowName + '-est-completed')
+                    .call(_estBarsCompleted, estScaleWidth);
+
+                // Create the bars that represent the actual completion dates.
+                var actScaleX = function(d) { return scaleX(d.get('actStartDate')); };
+                var actScaleWidth = function(d) { return scaleWidth(d.get('actStartDate'), d.get('actEndDate')); };
+
+                // Remove actual date bars if either actStartDate or actEndDate don't exist.
+                bars.selectAll('div.bar.' + rowName + '-act').filter(function(d) { return !d.get('actStartDate') || !d.get('actEndDate'); }).remove();
+
+                var actBars = bars
+                    .filter(function(d) { return d.get('actStartDate') && d.get('actEndDate'); })
+                    .selectAll('div.bar.' + rowName + '-act')
+                    .call(_actBars, actScaleX);
+
+                var actBarsFull = actBars
+                    .selectAll('div.' + rowName + '-act-full')
+                    .call(_actBarsFull, actScaleWidth);
+
+                var actBarsCompleted = actBars
+                    .selectAll('div.' + rowName + '-act-completed')
+                    .call(_actBarsCompleted, actScaleWidth);
+            };
+
+            // Enter selection
+            {
+                // Create a cell to span the whole bars area.
+                var cell = enter.append('td')
+                    .classed(rowName, true)
+                    .attr('colspan', unitSteps.length);
+
+                var group = cell.append('div')
+                    .classed(rowName + '-container', true)
+                    .classed('group', Task.prototype.accessor('group'));
+
+                var overlay = group.append('div').classed('overlay', true);
+
+                var bars = group.append('div')
+                    .classed(rowName + '-bars', true)
+                    .on('mousemove', this.displayPopup(this))
+                    .on('mouseout', this.hidePopup);
+
+                // Create the bars that represent the estimated completion dates.
+                var estScaleX = function(d) { return scaleX(d.get('estStartDate')); };
+                var estScaleWidth = function(d) { return scaleWidth(d.get('estStartDate'), d.get('estEndDate')); };
+
+                var estBars = bars
+                    .filter(function(d) { return d.get('estStartDate') && d.get('estEndDate'); })
+                    .append('div')
+                    .classed(rowName + '-est', true)
+                    .classed('bar', true)
+                    .call(_estBars, estScaleX);
+
+                var estBarsFull = estBars
+                    .append('div')
+                    .classed(rowName + '-est-full', true)
+                    .call(_estBarsFull, estScaleWidth);
+
+                var estBarsCompleted = estBars
+                    .append('div')
+                    .classed(rowName + '-est-completed', true)
+                    .call(_estBarsCompleted, estScaleWidth);
+
+                // Create the bars that represent the actual completion dates.
+                var actScaleX = function(d) { return scaleX(d.get('actStartDate')); };
+                var actScaleWidth = function(d) { return scaleWidth(d.get('actStartDate'), d.get('actEndDate')); };
+
+                var actBars = bars
+                    .filter(function(d) { return d.get('actStartDate') && d.get('actEndDate'); })
+                    .append('div')
+                    .classed(rowName + '-act', true)
+                    .classed('bar', true)
+                    .call(_actBars, actScaleX);
+
+                var actBarsFull = actBars
+                    .append('div')
+                    .classed(rowName + '-act-full', true)
+                    .call(_actBarsFull, actScaleWidth);
+
+                var actBarsCompleted = actBars
+                    .append('div')
+                    .classed(rowName + '-act-completed', true)
+                    .call(_actBarsCompleted, actScaleWidth);
+            };
+
+            // Update the date ranges.
+            var rangesUpdate = ranges.call(_.bind(interval.appendGroupCell, interval));
+            var rangesExit = ranges.exit().remove();
+            var rangesEnter = ranges.enter().append('td').call(_.bind(interval.appendGroupCell, interval));
+            ranges.order();
+
+            // Update the date columns.
+            var columnsUpdate = columns
+                .select('div.inner')
+                .style('width', Util.plusPx(interval.get('unitCellWidth')))
+                .select('div.background')
+                .style('background-color', _.bind(interval.getUnitBackgroundColor, interval))
+                .style('width', Util.plusPx(interval.get('unitCellWidth')))
+                .text(_.bind(interval.getUnitText, interval));
+
+            // Remove the exiting columns.
+            var columnsExit = columns.exit().remove();
+
+            // The date columns enter selection.
+            var columnsEnter = columns.enter()
+                .append('td')
+                .classed('day-cell', true)
+                    .append('div')
+                    .classed('inner', true)
                     .style('width', Util.plusPx(interval.get('unitCellWidth')))
-                    .text(interval.getUnitText(d));
-            });
+                        .append('div')
+                        .classed('background', true)
+                        .style('background-color', _.bind(interval.getUnitBackgroundColor, interval))
+                        .style('width', Util.plusPx(interval.get('unitCellWidth')))
+                        .text(_.bind(interval.getUnitText, interval));
 
-            // Create a cell to span the whole bars area.
-            var cell = selection.append('td')
-                .classed(rowName, true)
-                .attr('colspan', steps.length);
+            // Reorder the columns.
+            columns.order();
 
-            var group = cell.append('div')
-                .classed(rowName + '-container', true)
-                .classed('group', Task.prototype.accessor('group'));
-
-            var overlay = group.append('div').classed('overlay', true);
-
-            var bars = group.append('div')
-                .classed(rowName + '-bars', true)
-                .on('mousemove', this.displayPopup(this))
-                .on('mouseout', this.hidePopup);
-
-            // Create the bars that represent the estimated completion dates.
-            var estScaleX = function(d) { return scaleX(d.get('estStartDate')); };
-            var estScaleWidth = function(d) { return scaleWidth(d.get('estStartDate'), d.get('estEndDate')); };
-
-            var estBars = bars.filter(function(d) { return d.get('estStartDate') && d.get('estEndDate'); })
-                .append('div').classed(rowName + '-est', true)
-                .classed('bar', true)
-                .style('left', function(d,i) { return estScaleX(d) + 'px'; })
-                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 - 2) + 'px'; });
-
-            var estBarsFull = estBars.append('div').classed(rowName + '-est-full', true)
-                .style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
-                .style('width', function(d,i) { return Math.floor(estScaleWidth(d))  + 'px'; })
-                .style('background-color', Task.prototype.method('getBarColor'));
-
-            var estBarsCompleted = estBars.append('div').classed(rowName + '-est-completed', true)
-                .style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
-                .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
-                .style('width', function(d,i) { return Math.floor(estScaleWidth(d) * (d.get('completed') / 100)) + 'px'; })
-                .style('background-color', Task.prototype.method('getBarCompletionColor'));
-
-            // Create the bars that represent the actual completion dates.
-            var actScaleX = function(d) { return scaleX(d.get('actStartDate')); };
-            var actScaleWidth = function(d) { return scaleWidth(d.get('actStartDate'), d.get('actEndDate')); };
-
-            var actBars = bars.filter(function(d) { return d.get('actStartDate') && d.get('actEndDate'); })
-                .append('div').classed(rowName + '-act', true)
-                .classed('bar', true)
-                .style('left', function(d,i) { return actScaleX(d) + 'px'; })
-                .style('top', function(d,i) { return ((settings.rowHeight - settings.barHeight * 2) / 2 + settings.barHeight - 1) + 'px'; });
-
-            var actBarsFull = actBars.append('div').classed(rowName + '-act-full', true)
-                .style('height', Util.plusPx(Task.prototype.method('getBarHeight')))
-                .style('width', function(d,i) { return Math.floor(actScaleWidth(d))  + 'px'; })
-                .style('background-color', d3.rgb("#AAA").toString());
-
-            var actBarsCompleted = actBars.append('div').classed(rowName + '-act-completed', true)
-                .style('top', Util.plusPx(Task.prototype.method('getBarCompletionTop')))
-                .style('height', Util.plusPx(Task.prototype.method('getBarCompletionHeight')))
-                .style('width', function(d,i) { return Math.floor(actScaleWidth(d) * (d.get('completed') / 100)) + 'px'; })
-                .style('background-color', d3.rgb("#AAA").darker().toString());
+//            _.each(steps, function(d,i) {
+//                interval.appendGroupCell(d, i, ranges);
+//
+//                var cols = d3.select('tr.columns');
+//                var background = interval.getUnitBackgroundColor(d,i);
+//
+//                var colCells = cols.append('td').classed('day-cell', true);
+//                var colDivs = colCells.append('div').classed('inner', true).style('width', Util.plusPx(interval.get('unitCellWidth')));
+//                var colDays = colDivs.append('div')
+//                    .classed('background', true)
+//                    .style('background-color', background)
+//                    .style('width', Util.plusPx(interval.get('unitCellWidth')))
+//                    .text(interval.getUnitText(d));
+//            });
         },
 
         displayPopup: function(model) {

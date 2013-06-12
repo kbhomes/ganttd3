@@ -53,11 +53,15 @@ define(function(require) {
             return start.getFullYear();
         },
 
-        appendGroupCell: function(d,i,ranges) {
+        appendGroupCell: function(sel) {
             // Append a year for every week.
-            ranges.append('td')
-                .classed('date-range', true)
-                .text(this.getGroupText(d));
+            sel.classed('date-range', true)
+                .attr('colspan', undefined)
+                .text(this.getGroupText);
+        },
+
+        getGroupSteps: function() {
+            return this.getUnitSteps();
         },
 
         getUnitText: function(date) {

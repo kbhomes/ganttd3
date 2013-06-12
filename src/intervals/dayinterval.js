@@ -58,14 +58,17 @@ define(function(require) {
             return Util.fullDateFormat(start) + ' to ' + Util.fullDateFormat(this.get('unitInterval').offset(start, 6));
         },
 
-        appendGroupCell: function(d,i,ranges) {
+        appendGroupCell: function(sel) {
             // Append a date range for the week to ranges row.
-            if (i % 7 == 0) {
-                ranges.append('td')
-                    .classed('date-range', true)
-                    .attr('colspan', 7)
-                    .text(this.getGroupText(d));
-            }
+            sel.classed('date-range', true)
+                .attr('colspan', 7)
+                .text(_.bind(this.getGroupText, this));
+        },
+
+        getGroupSteps: function() {
+            return _.filter(this.get('unitInterval').range.apply(undefined, this.get('domain')), function(d,i) {
+                return i % 7 == 0;
+            });
         },
 
         getUnitText: function(date) {
