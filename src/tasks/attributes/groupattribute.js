@@ -3,15 +3,11 @@ define(function(require) {
 
     return {
         create: function(model) {
-            return new ComputedAttribute({
+            return new ComputedAttribute('group', {
                 model: model,
 
-                get: function() {
-                    return this.attributes['_group'] || this.model.get('tasks').length > 0;
-                },
-
-                set: function(value) {
-                    this.attributes['_group'] = value;
+                compute: function() {
+                    return this.model.get('tasks').length > 0;
                 }
             });
         }

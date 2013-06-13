@@ -3,17 +3,23 @@ define(function(require) {
 
     return {
         create: function(model) {
-            return new ComputedAttribute({
+            return new ComputedAttribute('completed', {
                 model: model,
 
                 initialize: function() {
-                    this.attributes['_completed'] = this.model.get('completed');
+                    this.set(this.model.get('completed'));
                 },
 
                 get: function() {
-                    if (this.attributes['_completed'])
-                        return this.attributes['_completed'];
+                    var computed = this.compute();
 
+                    if (typeof computed !== 'undefined')
+                        return computed;
+                    else
+                        return this.getForcedValue();
+                },
+
+                compute: function() {
                     if (this.model.get('group')) {
                         var children = this.model.get('tasks');
                         var comp = d3.mean(_.map(children, function(d) { return d.get('completed'); }));
@@ -23,21 +29,11 @@ define(function(require) {
                         if (!this.model.get('actStartDate')) {
                             return undefined;
                         }
-                        else {
-                            // If there's an end date, the project is completed (100%).
-                            if (this.model.get('actEndDate')) {
-                                return 100;
-                            }
-                            // Otherwise, show the manually entered completion.
-                            else {
-                                return this.attributes['_completed'];
-                            }
+                        // If there's an end date, the project is completed (100%).
+                        else if (this.model.get('actEndDate')) {
+                            return 100;
                         }
                     }
-                },
-
-                set: function(value) {
-                    this.attributes['_completed'] = value;
                 }
             });
         }

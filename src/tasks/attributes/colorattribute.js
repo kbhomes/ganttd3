@@ -3,29 +3,21 @@ define(function(require) {
 
     return {
         create: function(model) {
-            return new ComputedAttribute({
+            return new ComputedAttribute('color', {
                 model: model,
 
                 initialize: function() {
-                    this.attributes['_color'] = this.model.get('color');
-                    this.attributes['_gantt'] = this.model.get('gantt');
+                    this.set(this.model.get('color'));
 
-                    if (this.attributes['_gantt'])
-                        this.attributes['_settings'] = this.attributes['_gantt'].get('settings');
+                    this.setAttribute('_gantt', this.model.get('gantt'));
+
+                    if (this.getAttribute('_gantt'))
+                        this.setAttribute('_settings', this.getAttribute('_gantt').get('settings'));
                 },
 
-                get: function() {
-                    if (this.attributes['_color'])
-                        return this.attributes['_color'];
-
-                    if (this.attributes['_settings'] && typeof this.attributes['_settings'].colorGenerator == 'function')
-                        return this.attributes['_settings'].colorGenerator(this.model);
-                    else
-                        return undefined;
-                },
-
-                set: function(value) {
-                    this.attributes['_color'] = value;
+                compute: function() {
+                    if (this.getAttribute('_settings') && typeof this.getAttribute('_settings').colorGenerator == 'function')
+                        return this.getAttribute('_settings').colorGenerator(this.model);
                 }
             });
         }

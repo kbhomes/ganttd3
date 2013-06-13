@@ -20,10 +20,10 @@ define(function(require) {
         defaults: {
             id: '',
             name: '',
-            estStartDate: null,
-            estEndDate: null,
-            actStartDate: null,
-            actEndDate: null,
+            estStartDate: undefined,
+            estEndDate: undefined,
+            actStartDate: undefined,
+            actEndDate: undefined,
             completed: 0.00,
             collapsed: false,
             visible: true

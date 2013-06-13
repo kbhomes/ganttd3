@@ -3,25 +3,16 @@ define(function(require) {
 
     return {
         create: function(model) {
-            return new ComputedAttribute({
+            return new ComputedAttribute('estEndDate', {
                 model: model,
 
                 initialize: function() {
-                    this.attributes['_estEndDate'] = this.model.get('estEndDate');
+                    this.set(this.model.get('estEndDate'));
                 },
 
-                get: function() {
-                    if (this.attributes['_estEndDate'])
-                        return this.attributes['_estEndDate'];
-
+                compute: function() {
                     if (this.model.get('group'))
                         return d3.max(this.model.get('tasks'), function(t) { return t.get('estEndDate'); });
-                    else
-                        return this.attributes['_estEndDate'];
-                },
-
-                set: function(value) {
-                    this.attributes['_estEndDate'] = value;
                 }
             });
         }
