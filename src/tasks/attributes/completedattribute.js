@@ -10,19 +10,20 @@ define(function(require) {
                     this.set(this.model.get('completed'));
                 },
 
-                get: function() {
-                    var computed = this.compute();
-
-                    if (typeof computed !== 'undefined')
-                        return computed;
-                    else
-                        return this.getForcedValue();
+                hasForcedValue: function() {
+                    return (!this.model.get('group') && !this.model.get('actEndDate')) && typeof this.getAttribute('_force') !== 'undefined';
                 },
 
                 compute: function() {
                     if (this.model.get('group')) {
                         var children = this.model.get('tasks');
                         var comp = d3.mean(_.map(children, function(d) { return d.get('completed'); }));
+
+                        if (comp.toFixed(0) == comp)
+                            comp = comp.toFixed(0);
+                        else
+                            comp = comp.toFixed(1);
+
                         return comp;
                     }
                     else {

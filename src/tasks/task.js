@@ -29,28 +29,6 @@ define(function(require) {
             visible: true
         },
 
-        get: function(attr) {
-            var value = Backbone.Model.prototype.get.call(this, attr);
-
-            if (value instanceof ComputedAttribute) {
-                return value.get();
-            }
-            else {
-                return value;
-            }
-        },
-
-        set: function(attr, value) {
-            var target = Backbone.Model.prototype.get.call(this, attr);
-
-            if (target instanceof ComputedAttribute) {
-                target.set(value)
-            }
-            else {
-                Backbone.Model.prototype.set.call(this, attr, value);
-            }
-        },
-
         initialize: function() {
             this.set('tasks', []);
 
@@ -93,14 +71,7 @@ define(function(require) {
 
         getPercentCompletion: function() {
             if (this.get('completed')) {
-                var comp = this.get('completed');
-
-                if (comp.toFixed(0) == comp)
-                    comp = comp.toFixed(0);
-                else
-                    comp = comp.toFixed(1);
-
-                return comp + '%';
+                return this.get('completed') + '%';
             }
             else
                 return '';

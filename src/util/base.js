@@ -2,7 +2,8 @@
  * A base class that provides methods useful for callbacks.
  */
 define(function(require) {
-    var Backbone = require('backbone');
+    var Backbone = require('backbone'),
+        ComputedAttribute = require('util/computedattribute');
 
     // Base
     return Backbone.Model.extend({
@@ -56,6 +57,28 @@ define(function(require) {
                 var args2 = Array.prototype.slice.call(arguments, 1);
                 return thisArg[method].apply(thisArg, args1.concat(args2));
             };
+        },
+
+        get: function(attr, raw) {
+            var value = Backbone.Model.prototype.get.call(this, attr);
+
+            if (value instanceof ComputedAttribute && !raw) {
+                return value.get();
+            }
+            else {
+                return value;
+            }
+        },
+
+        set: function(attr, value) {
+            var target = Backbone.Model.prototype.get.call(this, attr);
+
+            if (target instanceof ComputedAttribute) {
+                target.set(value);
+            }
+            else {
+                Backbone.Model.prototype.set.call(this, attr, value);
+            }
         }
     });
 });
