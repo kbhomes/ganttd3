@@ -153,33 +153,26 @@ define(function(require) {
             var parent = this.get('selection');
             var data = this.flattenTree(this.get('data').models);
 
-            var _row = function(sel) {
-                sel.classed('group', Task.prototype.accessor('group'))
-                    .style('font-weight', Task.prototype.method('getRowFontWeight'));
-            };
-
             // Get the data for this new redraw.
             var selection = parent.selectAll('tr.row').data(_.filter(data, function(cd,ci) {
                 return cd.get('visible');
             }), Task.prototype.accessor('id'));
 
+            // Create a row for every piece of data.
+            var enter = selection.enter().append('tr').classed('row', true);
+
             // Update the current rows.
-            selection.call(_row);
+            selection.classed('group', Task.prototype.accessor('group'))
+                .style('font-weight', Task.prototype.method('getRowFontWeight'));
 
             // Remove the non-existent rows.
             var exit = selection.exit().remove();
-
-            // Create a row for every piece of data.
-            var enter = selection.enter();
-            var rows = enter.append('tr')
-                .classed('row', true)
-                .call(_row);
 
             // Reorder the elements so that any newly inserted elements are back where they belong.
             selection.order();
 
             // Render the columns.
-            this.drawColumns(selection, rows);
+            this.drawColumns(selection, enter);
         },
 
         drawColumnHeadings: function(columnsRow) {
