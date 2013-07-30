@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>GanttD3 - Example</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../build/ganttd3.css">
+        <style>
+            .gantt table {
+                margin-right: 8px;
+            }
+
+            .row-bars-est-completed {
+                display: none;
+            }
+
+            .view {
+                display: inline-block;
+                margin-left: 30px;
+            }
+
+            .columnsInterface {
+                display: inline-block;
+                margin-left: 30px;
+            }
+
+            .columnsInterface label {
+                margin-right: 15px;
+            }
+
+            input[type=checkbox],
+            input[type=radio] {
+                vertical-align: -3px;
+            }
+
+            .taskdialog {
+                display: none;
+            }
+
+            .ui-dialog.ui-widget {
+                padding: 0;
+                overflow: hidden;
+                border-radius: 6px 6px 0 0;
+                box-shadow: grey 0px 10px 35px 4px;
+                border-color: #666;
+            }
+
+            .ui-dialog .ui-dialog-titlebar.ui-widget-header {
+                border-radius: 0;
+                border: none;
+                font-size: 16px;
+                border-bottom: 1px solid #ccc;
+                padding: 1em;
+                background: #eee;
+            }
+
+            .ui-dialog .ui-dialog-buttonpane {
+                background: #eee;
+            }
+
+            .ui-dialog button.ui-button, .ui-dialog .ui-dialog-titlebar .ui-button.ui-dialog-titlebar-close {
+                border-radius: 2px;
+                border: 1px solid #888;
+                background: #f8f8f8;
+                box-shadow: #ccc 0px 2px 1px;
+            }
+
+            .ui-dialog button.ui-button:hover, .ui-dialog .ui-dialog-titlebar .ui-button.ui-dialog-titlebar-close:hover {
+                background: #eee;
+                box-shadow: #ccc 0px 2px 1px;
+            }
+
+            .ui-dialog button.ui-button:active, .ui-dialog .ui-dialog-titlebar .ui-button.ui-dialog-titlebar-close:active {
+                background: #eee;
+                box-shadow: none;
+                margin-bottom: 2px;
+            }
+
+            .row label:first-child {
+                display: inline-block;
+                text-align: right;
+                width: 150px;
+                font-weight: bold;
+            }
+
+            .row input {
+                padding: 5px;
+                margin: 4px 0 4px 10px;
+                border-radius: 2px;
+                border: 1px solid #aaa;
+                box-shadow: #eee 0px 2px 0px;
+            }
+
+            .row input.long {
+                width: 200px;
+            }
+        </style>
+        <style>
+            @media print {
+                .printLink { display: none; }
+                .view { display: none; }
+                .columnsInterface { display: none; }
+            }
+        </style>
+
+        <!--[if lt IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <script src="../lib/aight.js"></script>
+        <![endif]-->
+
+        <script src="../lib/underscore.js"></script>
+        <script src="../lib/backbone.js"></script>
+        <script src="../lib/d3.v3.js"></script>
+
+        <!--[if lt IE 9]>
+        <script src="../lib/aight.d3.js"></script>
+        <![endif]-->
+
+        <script src="../build/ganttd3.js"></script>
+
+        <link href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet">
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    </head>
+
+    <!--[if lt IE 9 ]>
+    <body class="ie">
+    <![endif]-->
+    <!--[if (gte IE 9)|!(IE)]>-->
+    <body>
+    <!--<![endif]-->
+        <div class="gantt">
+            <a class="printLink" href="#">Print</a>
+            <div class="view">
+                <span>Interval:</span>
+                <label for="dayView"><input type="radio" id="dayView" name="viewInterval">Day</label>
+                <label for="weekView"><input type="radio" id="weekView" name="viewInterval">Week</label>
+                <label for="monthView"><input type="radio" id="monthView" name="viewInterval">Month</label>
+            </div>
+            <div class="columnsInterface">
+                <span>Columns:</span>
+            </div>
+        </div>
+        <div class="taskpopup">
+            <span class="corner"></span>
+            <span class="taskname"></span>
+            <table class="taskdata"></table>
+        </div>
+        <div class="taskdialog">
+            <div class="row name">
+                <label for="task-name">Name: </label>
+                <input id="task-name" name="task-name" class="long" type="text" />
+            </div>
+            <div class="row description">
+                <label for="task-description">Description: </label>
+                <input id="task-description" name="task-description" class="long" type="text" />
+            </div>
+            <div class="row estStartDate">
+                <label for="task-estStartDate">Est. Start Date: </label>
+                <input id="task-estStartDate" name="task-estStartDate" type="text" readonly="readonly" />
+                <button id="task-estStartDate-clear"class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ui-button-text">Clear</span>
+                </button>
+            </div>
+            <div class="row estEndDate">
+                <label for="task-estEndDate">Est. End Date: </label>
+                <input id="task-estEndDate" name="task-estEndDate" type="text" readonly="readonly" />
+                <button id="task-estEndDate-clear"class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ui-button-text">Clear</span>
+                </button>
+            </div>
+            <div class="row actStartDate">
+                <label for="task-actStartDate">Act. Start Date: </label>
+                <input id="task-actStartDate" name="task-actStartDate" type="text" readonly="readonly" />
+                <button id="task-actStartDate-clear"class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ui-button-text">Clear</span>
+                </button>
+            </div>
+            <div class="row actEndDate">
+                <label for="task-actEndDate">Act. End Date: </label>
+                <input id="task-actEndDate" name="task-actEndDate" type="text" readonly="readonly" />
+                <button id="task-actEndDate-clear" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+                    <span class="ui-button-text">Clear</span>
+                </button>
+            </div>
+            <div class="row completed">
+                <label for="task-completed">% Completed: </label>
+                <input id="task-completed" name="task-completed" type="number" />
+            </div>
+        </div>
+        <script>
+            var g = new GanttD3('.gantt');
+            var s = g.get('settings');
+            s.linkCallback = function(task) {
+                var $dialog = $('.taskdialog');
+
+                var setupFormRow = function(name, isComputed, inputType) {
+                    var attr = task.get(name, isComputed);
+                    var $field = $dialog.find('#task-' + name);
+                    var $clearField = $dialog.find('#task-' + name + '-clear');
+
+                    if (!isComputed) {
+                        $field.val(attr);
+
+                        return function() {
+                            task.set(name, $field.val());
+                        };
+                    }
+                    else {
+                        switch (inputType) {
+                            case 'date':
+                                $field.datepicker({
+                                    dateFormat: "yy-mm-dd",
+                                    changeMonth: true,
+                                    changeYear: true,
+                                    yearRange: "c-20:c+10"
+                                }).datepicker('setDate', attr.get());
+
+                                $clearField.click(function() {
+                                    $field.datepicker('setDate', null);
+                                });
+
+                                return function() { task.set(name, $field.datepicker('getDate')); };
+
+                            case 'number':
+                                $field.val(attr.get());
+                                return function() { task.set(name, parseFloat($field.val())); };
+
+                            default:
+                                $field.val(attr.get());
+                                return function() { task.set(name, $field.val()); };
+                        }
+
+                        return function() {};
+                    }
+                };
+
+                var handlers = [];
+                handlers.push(setupFormRow('name'));
+                handlers.push(setupFormRow('description'));
+
+                if (!task.get('group')) {
+                    $(".row.estStartDate, .row.estEndDate, .row.actStartDate, .row.actEndDate, .row.completed").show();
+                    handlers.push(setupFormRow('estStartDate', true, 'date'));
+                    handlers.push(setupFormRow('estEndDate', true, 'date'));
+                    handlers.push(setupFormRow('actStartDate', true, 'date'));
+                    handlers.push(setupFormRow('actEndDate', true, 'date'));
+                    handlers.push(setupFormRow('completed', true));
+                }
+                else {
+                    $(".row.estStartDate, .row.estEndDate, .row.actStartDate, .row.actEndDate, .row.completed").hide();
+                }
+
+                $dialog.dialog({
+                    modal: true,
+                    width: 'auto',
+                    title: task.get('name'),
+                    resizable: false,
+                    buttons: {
+                        'Save': function() {
+                            _.each(handlers, function(h) { h(); });
+                            g.redraw();
+                            $(this).dialog('close');
+                        },
+
+                        'Cancel': function() {
+                            $(this).dialog('close');
+                        }
+                    }
+                });
+            };
+
+            g.add(g.createTask({ id: '1', name: 'ISTB 4', estStartDate: undefined, estEndDate: undefined, actStartDate: undefined, actEndDate: undefined, completed: 0.00 }));
+                g.add(g.createTask({ id: '1.1', name: 'General Conditions', estStartDate: undefined, estEndDate: undefined, actStartDate: undefined, actEndDate: undefined, completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.1.1', name: 'Receive Notice', estStartDate: new Date('01/03/2013'), estEndDate: new Date('01/05/2013'), actStartDate: new Date('01/06/2013'), actEndDate: new Date('01/08/2013'), completed: 100.00 }));
+                    g.add(g.createTask({ id: '1.1.2', name: 'Obtain Permits', estStartDate: new Date('01/06/2013'), estEndDate: new Date('01/11/2013'), actStartDate: new Date('01/09/2013'), actEndDate: new Date('01/14/2013'), completed: 50.00 }));
+                    g.add(g.createTask({ id: '1.1.3', name: 'Submit Bond', estStartDate: new Date('01/06/2013'), estEndDate: new Date('01/07/2013'), actStartDate: new Date('01/09/2013'), actEndDate: new Date('01/10/2013'), completed: 20.00 }));
+                    g.add(g.createTask({ id: '1.1.4', name: 'Submit Monthly Requests', estStartDate: new Date('01/06/2013'), estEndDate: new Date('01/06/2013'), actStartDate: new Date('01/09/2013'), actEndDate: new Date('01/09/2013'), completed: 75.00 }));
+                    g.add(g.createTask({ id: '1.1.5', name: 'Prepare and Submit', estStartDate: new Date('01/10/2013'), estEndDate: new Date('01/11/2013'), actStartDate: new Date('01/13/2013'), actEndDate: new Date('01/14/2013'), completed: 50.00 }));
+                    g.add(g.createTask({ id: '1.1.6', name: 'Prepare Values', estStartDate: new Date('01/12/2013'), estEndDate: new Date('01/13/2013'), actStartDate: new Date('01/15/2013'), actEndDate: new Date('01/16/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.1.7', name: 'Submit Preliminary', estStartDate: new Date('01/12/2013'), estEndDate: new Date('01/25/2013'), actStartDate: new Date('01/15/2013'), actEndDate: new Date('01/28/2013'), completed: 0.00 }));
+                g.add(g.createTask({ id: '1.2', name: 'Mobilize on Site', estStartDate: undefined, estEndDate: undefined, actStartDate: undefined, actEndDate: undefined, completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.2.1', name: 'Install Power', estStartDate: new Date('01/06/2013'), estEndDate: new Date('01/07/2013'), actStartDate: undefined, actEndDate: undefined, completed: 20.00 }));
+                    g.add(g.createTask({ id: '1.2.2', name: 'Install Water', estStartDate: new Date('01/06/2013'), estEndDate: new Date('01/07/2013'), actStartDate: new Date('01/09/2013'), actEndDate: new Date('01/10/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.2.3', name: 'Set up Office', estStartDate: new Date('01/10/2013'), estEndDate: new Date('01/16/2013'), actStartDate: new Date('01/13/2013'), actEndDate: new Date('01/15/2013'), completed: 0.00 }));
+                        g.add(g.createTask({ id: '1.2.3.1', name: 'Install Internet', estStartDate: new Date('01/10/2013'), estEndDate: new Date('01/14/2013'), actStartDate: new Date('01/13/2013'), actEndDate: new Date('01/17/2013'), completed: 0.00 }));
+                        g.add(g.createTask({ id: '1.2.3.2', name: 'Install Refrigerator', estStartDate: new Date('01/12/2013'), estEndDate: new Date('01/16/2013'), actStartDate: new Date('01/15/2013'), actEndDate: undefined, completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.2.4', name: 'Set Benchmarks', estStartDate: new Date('01/13/2013'), estEndDate: new Date('01/17/2013'), actStartDate: new Date('01/16/2013'), actEndDate: new Date('01/20/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.2.5', name: 'Prepare Site', estStartDate: new Date('01/18/2013'), estEndDate: new Date('01/19/2013'), actStartDate: new Date('01/21/2013'), actEndDate: new Date('01/22/2013'), completed: 0.00 }));
+                g.add(g.createTask({ id: '1.3', name: 'Long Lead Procurement', estStartDate: undefined, estEndDate: undefined, actStartDate: undefined, actEndDate: undefined, completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.1', name: 'Submit Steel', estStartDate: new Date('01/07/2013'), estEndDate: new Date('01/20/2013'), actStartDate: new Date('01/10/2013'), actEndDate: new Date('01/23/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.2', name: 'Detail Steel', estStartDate: new Date('01/21/2013'), estEndDate: new Date('04/13/2013'), actStartDate: new Date('01/24/2013'), actEndDate: new Date('04/16/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.3', name: 'Submit Electric', estStartDate: new Date('01/26/2013'), estEndDate: new Date('02/08/2013'), actStartDate: new Date('01/29/2013'), actEndDate: new Date('02/11/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.4', name: 'Submit Elevator', estStartDate: new Date('01/26/2013'), estEndDate: new Date('02/08/2013'), actStartDate: new Date('01/29/2013'), actEndDate: new Date('02/11/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.5', name: 'Submit HVAC', estStartDate: new Date('01/26/2013'), estEndDate: new Date('02/08/2013'), actStartDate: new Date('01/29/2013'), actEndDate: new Date('02/11/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.6', name: 'Submit Plumbing', estStartDate: new Date('01/26/2013'), estEndDate: new Date('02/08/2013'), actStartDate: new Date('01/29/2013'), actEndDate: new Date('02/11/2013'), completed: 0.00 }));
+                    g.add(g.createTask({ id: '1.3.7', name: 'Submit roofing', estStartDate: new Date('01/26/2013'), estEndDate: new Date('02/08/2013'), actStartDate: new Date('01/29/2013'), actEndDate: new Date('02/11/2013'), completed: 0.00 }));
+                
+            g.redraw();
+
+            // Add listeners for changing the interval.
+            (function() {
+                // Select the current listener.
+                switch (s.interval.get('name')) {
+                    case 'day':
+                        document.querySelector('#dayView').checked = true;
+                        break;
+
+                    case 'week':
+                        document.querySelector('#weekView').checked = true;
+                        break;
+
+                    case 'month':
+                        document.querySelector('#monthView').checked = true;
+                        break;
+                }
+
+                document.querySelector('#dayView').addEventListener('click', function() { s.useDayInterval(); });
+                document.querySelector('#weekView').addEventListener('click', function() { s.useWeekInterval(); });
+                document.querySelector('#monthView').addEventListener('click', function() { s.useMonthInterval(); });
+            })();
+
+            // Add listeners for removing the columns.
+            (function() {
+                var columnsInterface = document.querySelector('.columnsInterface');
+
+                _.each(g.get('columns'), function(col) {
+                    if (!col.get('label'))
+                        return;
+
+                    var label = document.createElement('label');
+
+                    var cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = true;
+                    cb.addEventListener('change', function() {
+                        if (this.checked) {
+                            document.querySelector('head').removeChild(document.querySelector('#style-' + col.get('name')));
+
+                            var spacer = document.querySelector('td.spacer');
+                            spacer.colSpan = parseInt(spacer.colSpan) + 1;
+                        }
+                        else {
+                            // Add our new style to the page.
+                            var rules  = '.' + col.getColumnName() + ' { display: none; }\n';
+                                rules += '.' + col.getRowName() +    ' { display: none; }\n';
+
+                            var style = document.createElement('style');
+                            style.type = 'text/css';
+
+                            if (typeof aight === 'undefined')
+                                style.innerHTML = rules;
+                            else
+                                style.styleSheet.cssText = rules;
+
+                            style.id = 'style-' + col.get('name');
+
+                            document.querySelector('head').appendChild(style);
+
+                            var spacer = document.querySelector('td.spacer');
+                            spacer.colSpan = parseInt(spacer.colSpan) - 1;
+                        }
+                    });
+
+                    var text = document.createTextNode(col.get('label'));
+
+                    label.appendChild(cb);
+                    label.appendChild(text);
+
+                    columnsInterface.appendChild(label);
+                });
+            })();
+
+            // Add a listener for the print link.
+            (function() {
+                var printLink = document.querySelector('a.printLink');
+                printLink.addEventListener('click', function() {
+                    var style;
+                    var table = document.querySelector('.gantt table');
+                    var tableWidth = table.clientWidth + 50;
+                    var tableHeight = table.clientHeight + 100;
+
+                    // Remove the existent print style if it exists.
+                    if (style = document.getElementById('print-style'))
+                        style.parentNode.removeChild(style);
+
+                    // Add our new style to the page.
+                    var rule = '@media print { @page { size: ' + tableWidth + 'px ' + tableHeight + 'px; } }';
+                    var style = document.createElement('style');
+                    style.type = 'text/css';
+
+                    if (typeof aight === 'undefined')
+                        style.innerHTML = rule;
+                    else
+                        style.styleSheet.cssText = rule;
+
+                    style.id = 'print-style';
+
+                    document.querySelector('head').appendChild(style);
+
+                    // Print.
+                    window.print();
+                });
+            })();
+        </script>
+    </body>
+</html>
