@@ -9,10 +9,15 @@ Gantt chart for HTML/JavaScript. Utilizes D3.js, Require.js, Backbone, and Under
 Requirements
 ------------
 
-* Node.js (0.10 or greater)
-* NPM (1.2 or greater)
-* Ruby (1.8 or greater)
-* Grunt CLI
+* [Node.js][1] (0.10 or greater)
+* [NPM][2] (1.2 or greater)
+* [Grunt][3] (see step 2 below)
+* [Ruby][4] (1.8 or greater)
+
+[1]: http://nodejs.org/
+[2]: https://npmjs.org/
+[3]: http://gruntjs.com/
+[4]: http://www.ruby-lang.org/en/
 
 Getting Started
 ---------------
