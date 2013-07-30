@@ -1,0 +1,155 @@
+body {
+  font-size: 10px;
+  font-family: Tahoma, Arial, Verdana, sans-serif; }
+
+body.ie tr.row td, body.ie tr.row th, body.ie tr.columns td, body.ie tr.columns th, body.ie tr.date-ranges td, body.ie tr.date-ranges th {
+  line-height: 24px; }
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  /* Some weird fix to get the bottom and right borders. */ }
+
+tr {
+  height: 25px; }
+  tr.row {
+    background-color: white; }
+    tr.row.group {
+      background-color: #f3f3f3; }
+    tr.row:hover {
+      background-color: #ffffbb; }
+
+td {
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 0px 5px;
+  white-space: nowrap; }
+
+td.day-cell {
+  vertical-align: top;
+  padding: 0; }
+  td.day-cell .inner .background {
+    z-index: 0;
+    position: absolute;
+    margin: -1px;
+    line-height: 24px;
+    border: 1px solid #ddd;
+    height: 100%; }
+
+td.row-name {
+  text-align: left; }
+  td.row-name .row-name-indent {
+    display: inline-block; }
+    td.row-name .row-name-indent.indent0 {
+      width: 0;
+      display: none; }
+    td.row-name .row-name-indent.indent1 {
+      width: 20px; }
+    td.row-name .row-name-indent.indent2 {
+      width: 40px; }
+    td.row-name .row-name-indent.indent3 {
+      width: 60px; }
+    td.row-name .row-name-indent.indent4 {
+      width: 80px; }
+    td.row-name .row-name-indent.indent5 {
+      width: 100px; }
+    td.row-name .row-name-indent.indent6 {
+      width: 120px; }
+    td.row-name .row-name-indent.indent7 {
+      width: 140px; }
+    td.row-name .row-name-indent.indent8 {
+      width: 160px; }
+    td.row-name .row-name-indent.indent9 {
+      width: 180px; }
+    td.row-name .row-name-indent.indent10 {
+      width: 200px; }
+  td.row-name .row-name-show-hide {
+    cursor: pointer;
+    padding: 0px 5px;
+    width: 0.75em;
+    display: inline-block;
+    text-align: center; }
+  td.row-name .row-name-name {
+    cursor: pointer; }
+  td.row-name .row-name-collapse-all {
+    margin-left: 5px;
+    color: #888;
+    cursor: pointer;
+    font-weight: normal; }
+
+td.row-bars {
+  padding: 0;
+  margin: 0;
+  vertical-align: top; }
+  td.row-bars .row-bars-container {
+    position: relative; }
+    td.row-bars .row-bars-container div {
+      position: absolute;
+      z-index: 2; }
+    td.row-bars .row-bars-container .overlay {
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      height: 24px;
+      border: 1px solid #ddd; }
+    td.row-bars .row-bars-container.group .row-bars-est-full:before, td.row-bars .row-bars-container.group .row-bars-act-full:before {
+      content: '';
+      position: absolute;
+      top: 7px;
+      left: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 2px;
+      border-color: black transparent transparent black;
+      /* Top and left black, bottom and right transparent */ }
+    td.row-bars .row-bars-container.group .row-bars-est-full:after, td.row-bars .row-bars-container.group .row-bars-act-full:after {
+      content: '';
+      position: absolute;
+      top: 7px;
+      right: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 2px;
+      border-color: black black transparent transparent;
+      /* Top and right black, bottom and left transparent */ }
+    td.row-bars .row-bars-container.group .row-bars-act-full:before {
+      border-color: #aaaaaa transparent transparent #aaaaaa;
+      /* Top and left grey, bottom and right transparent */ }
+    td.row-bars .row-bars-container.group .row-bars-act-full:after {
+      border-color: #aaaaaa #aaaaaa transparent transparent;
+      /* Top and right grey, bottom and left transparent */ }
+
+.taskpopup {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid #888;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 3px 0px;
+  z-index: 5;
+  padding: 10px;
+  max-width: 200px; }
+  .taskpopup .taskname {
+    font-weight: bold;
+    font-size: 11px;
+    display: block;
+    border-bottom: 1px solid #888;
+    margin-bottom: 5px; }
+  .taskpopup .taskdata {
+    color: #555; }
+    .taskpopup .taskdata tr {
+      height: 18px; }
+    .taskpopup .taskdata td {
+      text-align: left;
+      border: none; }
+      .taskpopup .taskdata td:first-child {
+        font-weight: bold; }
+  .taskpopup .corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-style: solid;
+    border-width: 0px 8px 8px 0px;
+    border-color: rgba(0, 0, 0, 0); }

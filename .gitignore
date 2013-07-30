@@ -1,7 +1,7 @@
 ### Build output.
-build/ganttd3.js
-build/ganttd3.min.js
-build/ganttd3.css
+#build/ganttd3.js
+#build/ganttd3.min.js
+#build/ganttd3.css
 
 ### WebStorm ###
 .idea/
@@ -25,4 +25,4 @@ node_modules
 
 ### SASS ###
 .sass-cache/
-*.css
+src/*.css
