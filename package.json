@@ -1,7 +1,15 @@
 {
   "name": "GanttD3",
   "version": "0.0.0",
-  "description": "A JavaScript Gantt chart, primarily using D3.js.",
+  "description": "Gantt chart for HTML/JavaScript. Utilizes D3.js, Require.js, Backbone, and Underscore.",
+  "author": "Sajid Anwar <sajidanwar94@gmail.com>",
+  "contributors": [
+    {
+      "name": "Sajid Anwar",
+      "email": "sajidanwar94@gmail.com"
+    }
+  ],
+  "keywords": ["gantt", "chart", "d3"],
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -11,10 +19,9 @@
     "grunt-contrib-clean": "~0.4.1",
     "grunt-contrib-watch": "~0.4.4"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kbhomes/ganttd3.git"
   },
-  "repository": "",
-  "author": "Sajid Anwar",
-  "license": "BSD"
+  "license": "MIT"
 }
